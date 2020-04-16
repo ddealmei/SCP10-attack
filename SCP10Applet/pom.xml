@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.irisa</groupId>
+    <artifactId>scp10</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>SCP10 Java Card Applet</name>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <properties>
+                <source.directory>src</source.directory>
+                <javacard.applet.name>SCP10Applet</javacard.applet.name>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jc.home>${basedir}/ext/jc212_kit</jc.home>
+        <javacard.package.name>org.irisa.scp10</javacard.package.name>
+        <javacard.package.aid>0xD0:0xD1:0xD2:0xD3:0xD4:0xD5:0x01</javacard.package.aid>
+        <javacard.applet.aid>0xD0:0xD1:0xD2:0xD3:0xD4:0xD5:0x01:0x01</javacard.applet.aid>
+        <javacard.major.version>1</javacard.major.version>
+        <javacard.minor.version>0</javacard.minor.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.2</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>javacard</artifactId>
+            <version>2.1.2</version>
+            <scope>system</scope>
+            <systemPath>${jc.home}/lib/api21.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <!-- Convert to cap file -->
+                <configuration>
+                    <tasks>
+                        <get src="https://github.com/martinpaljak/ant-javacard/releases/latest/download/ant-javacard.jar" dest="ext/" skipexisting="true"/>
+                        <taskdef name="javacard" classname="pro.javacard.ant.JavaCard" classpath="ext/ant-javacard.jar"/>
+
+                        <echo message="Converting to CAP file" />
+                        <javacard jckit="${jc.home}">
+                            <cap aid="${javacard.package.aid}" output="target/${project.artifactId}.cap" sources="${source.directory}/org/irisa/scp10/" verify="false">
+                                <applet class="${javacard.package.name}.SCP10Applet" aid="${javacard.applet.aid}"/>
+                            </cap>
+                        </javacard>
+
+                    </tasks>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>

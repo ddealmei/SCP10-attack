@@ -1,0 +1,4 @@
+pytlv
+scipy
+pycryptodome>=3.9.3
+pyscard>=1.9.9
